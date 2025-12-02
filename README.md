@@ -1,6 +1,10 @@
-# Differences Between Interfaces and Types in TypeScript
+# টাইপস্ক্রিপ্টে Interface vs Type এর পার্থক্য
 
-### Basic Difference
+## Interface vs Type নিয়ে আমি যা শিখলাম
+
+টাইপস্ক্রিপ্ট শিখতে গিয়ে `interface` vs `type` নিয়ে কনফিউজড হয়েছিলাম। এখন যা বুঝলাম:
+
+### মূল পার্থক্য
 
 **Interface:**
 ```typescript
@@ -18,11 +22,11 @@ type Person = {
 };
 ```
 
-They look similar but have some key differences:
+দেখতে একই রকম মনে হয়, কিন্তু কিছু গুরুত্বপূর্ণ পার্থক্য আছে:
 
-### 1. Extending vs Intersection
+### ১. এক্সটেন্ড করা vs ইন্টারসেকশন
 
-**Interface extending (like inheritance):**
+**Interface Extend করা (উত্তরাধিকারের মতো):**
 ```typescript
 interface Animal {
     name: string;
@@ -33,7 +37,7 @@ interface Dog extends Animal {
 }
 ```
 
-**Type intersection:**
+**Type ইন্টারসেকশন:**
 ```typescript
 type Animal = {
     name: string;
@@ -44,9 +48,9 @@ type Dog = Animal & {
 }
 ```
 
-### 2. Declaration Merging
+### ২. ডিক্লারেশন মার্জিং
 
-**Interfaces can be reopened:**
+**Interface রি-ওপেন করা যায়:**
 ```typescript
 interface User {
     name: string;
@@ -59,20 +63,20 @@ interface User {
 // User now has both name and email!
 ```
 
-**Types can't do this - you get an error:**
+**Type এটা করতে পারে না - এরর দেয়:**
 ```typescript
 type User = { name: string; }
 type User = { email: string; } // Error!
 ```
 
-### 3. What Each Can Do
+### ৩. কোনটা কী করতে পারে
 
-**Types are more flexible - they can represent:**
-- Primitive types: `type ID = string;`
-- Union types: `type Status = "loading" | "success" | "error";`
-- Tuples: `type Coordinates = [number, number];`
+**Type বেশি ফ্লেক্সিবল - এটা দিয়ে করা যায়:**
+- প্রিমিটিভ টাইপ: `type ID = string;`
+- ইউনিয়ন টাইপ: `type Status = "loading" | "success" | "error";`
+- টাপল: `type Coordinates = [number, number];`
 
-**Interfaces are mainly for object shapes:**
+**Interface মূলত অবজেক্ট শেপের জন্য:**
 ```typescript
 interface User {
     id: number;
@@ -81,26 +85,26 @@ interface User {
 }
 ```
 
-### 4. Performance
+### ৪. পারফরম্যান্স
 
-Interfaces are generally faster for TypeScript to process, especially with large codebases, because they're optimized for object shape checking.
+Interface সাধারণত TypeScript এর জন্য ফাস্টার, বিশেষ করে বড় প্রোজেক্টে, কারণ এগুলো অবজেক্ট শেপ চেকিং এর জন্য অপটিমাইজড।
 
+### আমি কখন কোনটা ব্যবহার করি
 
+**আমি interface ব্যবহার করি যখন:**
+- অবজেক্ট শেপ ডিফাইন করতে (আমাদের Product interface এর মতো)
+- ক্লাস-লাইক স্ট্রাকচার বিল্ড করতে
+- এক্সটেন্ড/মার্জ করতে চাই
 
-**Use interfaces when:**
-- Defining object shapes (like our Product interface)
-- Building class-like structures
-- Want to extend/merge definitions
+**আমি type ব্যবহার করি যখন:**
+- ইউনিয়ন টাইপ লাগে (উপরের Status এর মতো)
+- প্রিমিটিভ বা টাপল নিয়ে কাজ করি
+- কমপ্লেক্স টাইপ ট্রান্সফরমেশন করি
 
-**Use types when:**
-- Needing union types (like Status above)
-- Working with primitives or tuples
-- Doing complex type transformations
-
-### Real Example from Our Code
+### আমাদের কোডের রিয়েল উদাহরণ
 
 ```typescript
-// Using interface (what we did):
+// Interface used (what we did):
 interface Product {
     name: string;
     price: number;
@@ -121,11 +125,11 @@ type Product = {
 
 ---
 
-## 2. What is the use of `keyof` keyword in TypeScript?
+## ২. `keyof` কী এবং এটা দিয়ে কী করা যায়?
 
-### The Basic Idea
+### মূল ধারণা
 
-`keyof` gives you the keys of an object type as a union of strings. Here's what it means:
+`keyof` কোনো অবজেক্ট টাইপের কীগুলোকে স্ট্রিং ইউনিয়ন হিসেবে দেয়। কী মানে?
 
 ```typescript
 interface User {
@@ -137,22 +141,24 @@ interface User {
 type UserKeys = keyof User; // "name" | "age" | "email"
 ```
 
-So `keyof User` becomes the type `"name" | "age" | "email"`. It's like asking TypeScript "what are the property names of this object?"
+তো `keyof User` হয়ে গেল `"name" | "age" | "email"` টাইপ। মানে TypeScript কে জিজ্ঞেস করা "এই অবজেক্টের প্রপার্টি নামগুলো কী?"
 
-### Why This is Actually Useful
+### এটা দিয়ে কী করা যায়
 
-**Example 1: Making a getProperty function**
+প্রথমে মনে হতেই পারে "ঠিক আছে, কিন্তু এটা দিয়ে কী করব?" কিছু উদাহরণ দেখি:
+
+**উদাহরণ ১: getProperty ফাংশন বানানো**
 ```typescript
 function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
     return obj[key];
 }
 
 const user = { name: "John", age: 30 };
-const name = getProperty(user, "name"); // TypeScript knows this is a string
-const age = getProperty(user, "age");   // TypeScript knows this is a number
+const name = getProperty(user, "name"); // TypeScript knows this is string
+const age = getProperty(user, "age");   // TypeScript knows this is number
 ```
 
-**Example 2: Make sure not to typo property names**
+**উদাহরণ ২: টাইপো ঠেকানো**
 ```typescript
 function updateUserProperty(user: User, key: keyof User, value: any) {
     user[key] = value;
@@ -165,9 +171,9 @@ updateUserProperty(user, "name", "Jane");
 updateUserProperty(user, "nmae", "Jane");
 ```
 
-### Real World Example 
+### রিয়েল লাইফ উদাহরণ
 
-Lets assume, building a form and want to make sure field names match data structure:
+আমি একটা ফর্ম বানাচ্ছি এবং চাই আমার ফিল্ড নাম ডাটা স্ট্রাকচারের সাথে মিলুক:
 
 ```typescript
 interface Product {
@@ -185,10 +191,13 @@ function handleFormField(field: FormField, value: string) {
     console.log(`Updating ${field} with ${value}`);
 }
 ```
-`keyof` works with our existing Product interface from the assignment:
+
+### কুল পার্ট
+
+`keyof` আমাদের অ্যাসাইনমেন্টের Product interface এর সাথেও কাজ করে:
 
 ```typescript
-// earlier code
+// From our previous code
 interface Product {
     name: string;
     price: number;
@@ -196,7 +205,7 @@ interface Product {
     discount?: number;
 }
 
-// make a function that only accepts valid Product keys
+// I can make a function that only accepts valid Product keys
 function getProductKey(key: keyof Product): string {
     return key; // This will only accept "name", "price", "quantity", or "discount"
 }
@@ -206,12 +215,10 @@ getProductKey("price");    // ✓ Works
 getProductKey("invalid");  // ✗ Error - TypeScript catches the mistake!
 ```
 
-### Summary
+### সারাংশ
 
-`keyof` is basically TypeScript's way of letting you work with object property names as types. It's super useful for:
-- Making generic functions that work with object properties
-- Preventing typos in property names
-- Building type-safe utilities that work with objects
+`keyof` মূলত TypeScript এর উপায় যেন আপনি অবজেক্ট প্রপার্টি নামগুলো টাইপ হিসেবে ব্যবহার করতে পারেন। এটা সুপার কাজের:
+- জেনেরিক ফাংশন বানাতে যা অবজেক্ট প্রপার্টি নিয়ে কাজ করে
+- টাইপো ঠেকাতে
+- টাইপ-সেফফ ইউটিলিটি বানাতে যা অবজেক্ট নিয়ে কাজ করে
 
-Once I started using it, I realized how much safer it makes my code - TypeScript catches so many dumb mistakes I would have made otherwise!
-```
